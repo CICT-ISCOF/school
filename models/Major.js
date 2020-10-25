@@ -1,15 +1,15 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../libraries/sequelize');
 
-const Model = sequelize.define('Token', {
-	hash: {
+const Model = sequelize.define('Major', {
+	title: {
 		type: DataTypes.STRING,
 		allowNull: false,
 	},
 });
 
-Model.associate = ({ User }) => {
-	Model.belongsTo(User);
+Model.associate = ({ Course }) => {
+	Model.belongsTo(Course);
 };
 
 Model.registerEvents = (models) => {};

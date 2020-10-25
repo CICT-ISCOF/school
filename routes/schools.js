@@ -1,5 +1,13 @@
 const router = require('express').Router();
-const { School, File, Education, Degree, User } = require('../models');
+const {
+	School,
+	File,
+	Education,
+	Degree,
+	User,
+	Course,
+	Major,
+} = require('../models');
 const { upload } = require('../libraries/multer');
 const fs = require('fs');
 const passport = require('../libraries/passport');
@@ -10,7 +18,20 @@ router.get('/', async (req, res) => {
 	try {
 		res.json(
 			await School.findAll({
-				include: [File, Education, Degree, User],
+				include: [
+					File,
+					Education,
+					{
+						model: Degree,
+						include: [
+							{
+								model: Course,
+								include: Major,
+							},
+						],
+					},
+					User,
+				],
 			})
 		);
 	} catch (error) {
@@ -24,7 +45,15 @@ router.get('/:id', async (req, res) => {
 	try {
 		return res.json(
 			await School.findByPk(id, {
-				include: [File, Education, Degree, User],
+				include: [
+					File,
+					Education,
+					{
+						model: Degree,
+						include: Course,
+					},
+					User,
+				],
 			})
 		);
 	} catch (error) {
@@ -38,6 +67,9 @@ router.post(
 	upload.single('photo'),
 	[
 		body('region').notEmpty().bail().isString(),
+		body('type').notEmpty().bail().isString(),
+		body('district').notEmpty().bail().isString(),
+		body('province').notEmpty().bail().isString(),
 		body('name').notEmpty().bail().isString(),
 		body('address').notEmpty().bail().isString(),
 		body('phone').notEmpty().bail().isNumeric(),
@@ -81,6 +113,9 @@ router.put(
 	upload.single('photo'),
 	[
 		body('region').notEmpty().bail().isString().bail().optional(),
+		body('type').notEmpty().bail().isString().bail().optional(),
+		body('district').notEmpty().bail().isString().bail().optional(),
+		body('province').notEmpty().bail().isString().bail().optional(),
 		body('name').notEmpty().bail().isString().bail().optional(),
 		body('address').notEmpty().bail().isString().bail().optional(),
 		body('phone').notEmpty().bail().isNumeric().bail().optional(),

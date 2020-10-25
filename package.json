@@ -5,7 +5,8 @@
 	"scripts": {
 		"linux": "DEBUG=school:* npm run dev",
 		"windows": "npm run dev",
-		"dev": "nodemon server.js"
+		"dev": "nodemon server.js",
+		"start": "node server.js"
 	},
 	"dependencies": {
 		"bcrypt": "^5.0.0",

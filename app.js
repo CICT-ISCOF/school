@@ -11,6 +11,10 @@ const models = require('./models');
 
 app.set('sequelize', sequelize);
 
+// Uncomment to reset DB
+// then re-run nodemon
+// sequelize.sync({ force: true });
+
 // paths setup
 app.set('storage_path', path.join(__dirname, 'storage'));
 
@@ -21,8 +25,11 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 app.use('/api/auth', require('./routes/auth'));
+app.use('/api/courses', require('./routes/courses'));
+app.use('/api/degrees', require('./routes/degrees'));
 app.use('/api/education', require('./routes/education'));
 app.use('/api/file', require('./routes/file'));
+app.use('/api/majors', require('./routes/majors'));
 app.use('/api/schools', require('./routes/schools'));
 app.use('/api/users', require('./routes/users'));
 

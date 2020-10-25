@@ -20,4 +20,6 @@ Model.associate = ({ School }) => {
 	Model.belongsTo(School);
 };
 
+Model.registerEvents = (models) => {};
+
 module.exports = Model;

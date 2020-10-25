@@ -44,8 +44,10 @@ Model.process = (file, public) => {
 	});
 };
 
-Model.beforeDestroy((file) => {
-	fs.unlinkSync(file.url);
-});
+Model.registerEvents = (models) => {
+	Model.beforeDestroy((file) => {
+		fs.unlinkSync(file.url);
+	});
+};
 
 module.exports = Model;

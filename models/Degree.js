@@ -11,8 +11,20 @@ const Model = sequelize.define('Degree', {
 	},
 });
 
-Model.associate = ({ School }) => {
+Model.associate = ({ School, Course }) => {
 	Model.belongsTo(School);
+	Model.hasMany(Course);
+};
+
+Model.registerEvents = ({ Course }) => {
+	Model.beforeDestroy(async (degree) => {
+		const courses = await Course.findAll({
+			where: {
+				DegreeId: degree.id,
+			},
+		});
+		courses.forEach((course) => course.destroy());
+	});
 };
 
 module.exports = Model;

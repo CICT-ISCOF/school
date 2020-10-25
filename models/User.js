@@ -20,4 +20,15 @@ Model.associate = ({ Token }) => {
 	Model.hasMany(Token);
 };
 
+Model.registerEvents = ({ Token }) => {
+	Model.beforeDestroy(async (user) => {
+		const tokens = await Token.findAll({
+			where: {
+				UserId: user.id,
+			},
+		});
+		tokens.forEach((token) => token.destroy());
+	});
+};
+
 module.exports = Model;

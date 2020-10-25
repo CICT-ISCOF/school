@@ -5,9 +5,11 @@ if (process.env.ENV !== 'production') {
 }
 
 const models = {
+	Course: require('./Course'),
 	Degree: require('./Degree'),
 	Education: require('./Education'),
 	File: require('./File'),
+	Major: require('./Major'),
 	School: require('./School'),
 	User: require('./User'),
 	Token: require('./Token'),
@@ -15,33 +17,7 @@ const models = {
 
 Object.values(models).forEach((model) => {
 	model.associate(models);
-});
-
-models.School.beforeDestroy((school) => {
-	models.Degree.destroy({
-		where: {
-			SchoolId: school.id,
-		},
-	});
-	models.Education.destroy({
-		where: {
-			SchoolId: school.id,
-		},
-	});
-});
-
-models.School.afterDestroy(async (school) => {
-	const file = await models.File.findByPk(school.FileId);
-	file.destroy();
-});
-
-models.User.beforeDestroy(async (user) => {
-	const schools = await models.School.findAll({
-		where: {
-			UserId: user.id,
-		},
-	});
-	schools.forEach((school) => school.destroy());
+	model.registerEvents(models);
 });
 
 module.exports = models;

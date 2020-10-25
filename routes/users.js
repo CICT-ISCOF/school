@@ -1,7 +1,15 @@
 const router = require('express').Router();
 const hash = require('bcrypt');
 const passport = require('../libraries/passport');
-const { User, School, File, Degree, Education, Token } = require('../models');
+const {
+	User,
+	School,
+	File,
+	Degree,
+	Education,
+	Token,
+	Course,
+} = require('../models');
 const { body, validationResult, matchedData } = require('express-validator');
 
 const onlyAdmin = (req, res, next) => {
@@ -40,7 +48,14 @@ router.get(
 					include: [
 						{
 							model: School,
-							include: [File, Degree, Education],
+							include: [
+								File,
+								{
+									model: Degree,
+									include: Course,
+								},
+								Education,
+							],
 						},
 					],
 				})
