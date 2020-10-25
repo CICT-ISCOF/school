@@ -2,6 +2,6 @@ require('./server');
 const sequelize = require('./libraries/sequelize');
 
 sequelize
-	.sync()
+	.dropAllSchemas()
 	.catch(() => {})
 	.finally(() => process.exit(0));

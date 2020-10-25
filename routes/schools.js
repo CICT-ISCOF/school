@@ -19,7 +19,14 @@ router.get('/', async (req, res) => {
 		res.json(
 			await School.findAll({
 				include: [
-					File,
+					{
+						model: File,
+						as: 'ProfilePicture',
+					},
+					{
+						model: File,
+						as: 'CoverPhoto',
+					},
 					Education,
 					{
 						model: Degree,
@@ -46,7 +53,14 @@ router.get('/:id', async (req, res) => {
 		return res.json(
 			await School.findByPk(id, {
 				include: [
-					File,
+					{
+						model: File,
+						as: 'ProfilePicture',
+					},
+					{
+						model: File,
+						as: 'CoverPhoto',
+					},
 					Education,
 					{
 						model: Degree,
@@ -64,7 +78,10 @@ router.get('/:id', async (req, res) => {
 router.post(
 	'/',
 	passport.authenticate('bearer', { session: false }),
-	upload.single('photo'),
+	upload.fields([
+		{ name: 'profile_picture', maxCount: 1 },
+		{ name: 'cover_photo', maxCount: 1 },
+	]),
 	[
 		body('region').notEmpty().bail().isString(),
 		body('type').notEmpty().bail().isString(),
@@ -81,24 +98,33 @@ router.post(
 	],
 	async (req, res) => {
 		const errors = validationResult(req).array();
-		if (!req.file) {
-			errors.push({
-				msg: 'Photo is required.',
-				param: 'photo',
-				location: 'body',
-			});
-		}
+
 		if (errors.length > 0) {
 			return res.status(422).json({ errors });
 		}
 
 		try {
 			const data = matchedData(req, { locations: ['body'] });
-			const file = await File.process(req.file, true);
-			data.FileId = file.id;
+
+			const profilePicture = await File.process(
+				req.files['profile_picture'][0],
+				true
+			);
+			data.ProfilePictureId = profilePicture.id;
+
+			const coverPhoto = await File.process(
+				req.files['cover_photo'][0],
+				true
+			);
+			data.CoverPhotoId = coverPhoto.id;
+
 			data.UserId = req.user.id;
+
 			const school = await School.create(data);
-			school.set('File', file);
+
+			school.set('ProfilePicture', profilePicture);
+			school.set('CoverPhoto', coverPhoto);
+
 			return res.status(201).json(school);
 		} catch (error) {
 			if (req.file) {
@@ -113,7 +139,10 @@ router.post(
 router.put(
 	'/:id',
 	passport.authenticate('bearer', { session: false }),
-	upload.single('photo'),
+	upload.fields([
+		{ name: 'profile_picture', maxCount: 1 },
+		{ name: 'cover_photo', maxCount: 1 },
+	]),
 	[
 		body('region').notEmpty().bail().isString().bail().optional(),
 		body('type').notEmpty().bail().isString().bail().optional(),
@@ -150,26 +179,52 @@ router.put(
 			const data = matchedData(req, { locations: ['body'] });
 
 			const school = await School.findByPk(id, {
-				include: [File, Education, Degree],
+				include: [
+					{
+						model: File,
+						as: 'ProfilePicture',
+					},
+					{
+						model: File,
+						as: 'CoverPhoto',
+					},
+					Education,
+					Degree,
+				],
 			});
 
 			if (!school) {
 				return res.sendStatus(404);
 			}
 
-			if (req.file) {
-				const file = await File.process(req.file, true);
-				data.FileId = file.id;
-				school.File.destroy();
-				school.set('File', file);
+			if ('profile_picture' in req.files) {
+				const profilePicture = await File.process(
+					req.files['profile_picture'][0],
+					true
+				);
+				data.ProfilePictureId = profilePicture.id;
+				school.ProfilePicture.destroy();
+				school.set('ProfilePicture', profilePicture);
+			}
+
+			if ('cover_photo' in req.files) {
+				const coverPhoto = await File.process(
+					req.files['cover_photo'][0],
+					true
+				);
+				data.CoverPhotoId = coverPhoto.id;
+				school.CoverPhoto.destroy();
+				school.set('CoverPhoto', coverPhoto);
 			}
 
 			school.update(data);
 
 			return res.json(school);
 		} catch (error) {
-			if (req.file) {
-				fs.unlinkSync(req.file.path);
+			if (req.files) {
+				Object.values(req.files).forEach((files) => {
+					files.forEach((file) => fs.unlinkSync(file.path));
+				});
 			}
 			console.log(error);
 			res.status(500).json(error);

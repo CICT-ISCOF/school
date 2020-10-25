@@ -55,15 +55,23 @@ const Model = sequelize.define('School', {
 Model.associate = ({ Degree, File, Education, User }) => {
 	Model.hasMany(Degree);
 	Model.hasMany(Education);
-	Model.belongsTo(File);
+	Model.belongsTo(File, {
+		as: 'ProfilePicture',
+		foreignKey: 'ProfilePictureId',
+	});
+	Model.belongsTo(File, { as: 'CoverPhoto', foreignKey: 'CoverPhotoId' });
 	Model.belongsTo(User);
 };
 
 Model.registerEvents = ({ Degree, Education, File }) => {
 	Model.afterDestroy(async (school) => {
-		const file = await File.findByPk(school.FileId);
-		file.destroy();
+		const profilePicture = await File.findByPk(school.ProfilePictureId);
+		profilePicture.destroy();
+
+		const coverPhoto = await File.findByPk(school.CoverPhotoId);
+		coverPhoto.destroy();
 	});
+
 	Model.beforeDestroy(async (school) => {
 		const degrees = await Degree.findAll({
 			where: {

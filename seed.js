@@ -18,45 +18,58 @@ User.create({
 	.then((user) => {
 		return {
 			user,
-			file: File.create({
+			profilePicture: File.create({
 				url:
-					'https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Round_Landmark_School_Icon_-_Transparent.svg/512px-Round_Landmark_School_Icon_-_Transparent.svg.png',
-				size: 30921,
+					'http://www.iscof.edu.ph/oasyrtyd/2018/05/ISCOF-Seal-img1-300x300.png',
+				size: 120250,
+				type: 'image/png',
+				name: 'photo.png',
+				public: 1,
+			}),
+			coverPhoto: File.create({
+				url:
+					'http://www.iscof.edu.ph/oasyrtyd/2020/09/0title-card-Copy.jpg',
+				size: 120250,
 				type: 'image/png',
 				name: 'photo.png',
 				public: 1,
 			}),
 		};
 	})
-	.then(({ user, file }) => {
-		return file.then((file) => {
-			return {
-				user,
-				file,
-				school: School.create({
-					region: '6',
-					type: 'Public',
-					district: '6',
-					province: 'Iloilo',
-					name: 'Iloilo State College of Fisheries',
-					address: 'Barotac Nuevo, Iloilo',
-					phone: '09169258735',
-					email: 'president@iscof.edu.ph',
-					website: 'iscof.edu.ph',
-					curricular_program: 'Program',
-					mission: 'Mission',
-					vision: 'Vision',
-					UserId: user.id,
-					FileId: file.id,
-				}),
-			};
-		});
+	.then(({ user, coverPhoto, profilePicture }) => {
+		return Promise.all([coverPhoto, profilePicture]).then(
+			([coverPhoto, profilePicture]) => {
+				return {
+					user,
+					coverPhoto,
+					profilePicture,
+					school: School.create({
+						region: '6',
+						type: 'Public',
+						district: '6',
+						province: 'Iloilo',
+						name: 'Iloilo State College of Fisheries',
+						address: 'Barotac Nuevo, Iloilo',
+						phone: '09169258735',
+						email: 'president@iscof.edu.ph',
+						website: 'iscof.edu.ph',
+						curricular_program: 'Program',
+						mission: 'Mission',
+						vision: 'Vision',
+						UserId: user.id,
+						CoverPhotoId: coverPhoto.id,
+						ProfilePictureId: profilePicture.id,
+					}),
+				};
+			}
+		);
 	})
-	.then(({ user, file, school }) => {
+	.then(({ user, coverPhoto, profilePicture, school }) => {
 		return school.then((school) => {
 			return {
 				user,
-				file,
+				coverPhoto,
+				profilePicture,
 				school,
 				degree: Degree.create({
 					name: 'Doctorate Degree',
@@ -67,11 +80,12 @@ User.create({
 			};
 		});
 	})
-	.then(({ user, file, school, degree }) => {
+	.then(({ user, coverPhoto, profilePicture, school, degree }) => {
 		return degree.then((degree) => {
 			return {
 				user,
-				file,
+				coverPhoto,
+				profilePicture,
 				school,
 				degree,
 				course: Course.create({
@@ -83,11 +97,12 @@ User.create({
 			};
 		});
 	})
-	.then(({ user, file, school, degree, course }) => {
+	.then(({ user, coverPhoto, profilePicture, school, degree, course }) => {
 		return course.then((course) => {
 			return {
 				user,
-				file,
+				coverPhoto,
+				profilePicture,
 				school,
 				degree,
 				course,
@@ -99,24 +114,35 @@ User.create({
 			};
 		});
 	})
-	.then(({ user, file, school, degree, course, major }) => {
-		return major.then((major) => {
-			return {
-				user,
-				file,
-				school,
-				degree,
-				course,
-				major,
-				education: Education.create({
-					type: 'Preschool',
-					tuition: '5,000',
-					SchoolId: school.id,
-					description: 'Description',
-				}),
-			};
-		});
-	})
+	.then(
+		({
+			user,
+			coverPhoto,
+			profilePicture,
+			school,
+			degree,
+			course,
+			major,
+		}) => {
+			return major.then((major) => {
+				return {
+					user,
+					coverPhoto,
+					profilePicture,
+					school,
+					degree,
+					course,
+					major,
+					education: Education.create({
+						type: 'Preschool',
+						tuition: '5,000',
+						SchoolId: school.id,
+						description: 'Description',
+					}),
+				};
+			});
+		}
+	)
 	.then(({ education }) => {
 		return education.then((education) => education);
 	})
