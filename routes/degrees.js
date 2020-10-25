@@ -47,6 +47,7 @@ router.post(
 				}
 				return type;
 			}),
+		body('description').notEmpty().bail().isString(),
 		body('SchoolId')
 			.notEmpty()
 			.bail()
@@ -101,6 +102,7 @@ router.put(
 				return type;
 			})
 			.optional(),
+		body('description').notEmpty().bail().isString().optional(),
 		body('SchoolId')
 			.notEmpty()
 			.bail()

@@ -67,6 +67,7 @@ router.post(
 	passport.authenticate('bearer', { session: false }),
 	[
 		body('title').notEmpty().bail().isString(),
+		body('description').notEmpty().bail().isString(),
 		body('CourseId')
 			.notEmpty()
 			.bail()
@@ -110,6 +111,7 @@ router.put(
 	passport.authenticate('bearer', { session: false }),
 	[
 		body('title').notEmpty().bail().isString().bail().optional(),
+		body('description').notEmpty().bail().isString().optional(),
 		body('CourseId')
 			.notEmpty()
 			.bail()

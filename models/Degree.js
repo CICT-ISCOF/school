@@ -9,6 +9,10 @@ const Model = sequelize.define('Degree', {
 	type: {
 		type: DataTypes.ENUM(['Bachelor', 'Master', 'PhD']),
 	},
+	description: {
+		type: DataTypes.TEXT,
+		allowNull: false,
+	},
 });
 
 Model.associate = ({ School, Course }) => {

@@ -13,6 +13,11 @@ const Model = sequelize.define('Education', {
 	date_of_examination: {
 		type: DataTypes.DATE,
 		allowNull: true,
+		default: null,
+	},
+	description: {
+		type: DataTypes.TEXT,
+		allowNull: false,
 	},
 });
 

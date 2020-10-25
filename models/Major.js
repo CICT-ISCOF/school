@@ -6,6 +6,10 @@ const Model = sequelize.define('Major', {
 		type: DataTypes.STRING,
 		allowNull: false,
 	},
+	description: {
+		type: DataTypes.TEXT,
+		allowNull: false,
+	},
 });
 
 Model.associate = ({ Course }) => {

@@ -18,6 +18,18 @@ const Model = sequelize.define('School', {
 		type: DataTypes.STRING,
 		allowNull: false,
 	},
+	curricular_program: {
+		type: DataTypes.TEXT,
+		allowNull: false,
+	},
+	mission: {
+		type: DataTypes.TEXT,
+		allowNull: false,
+	},
+	vision: {
+		type: DataTypes.TEXT,
+		allowNull: false,
+	},
 	name: {
 		type: DataTypes.STRING,
 		allowNull: false,

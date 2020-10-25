@@ -46,7 +46,9 @@ Model.process = (file, public) => {
 
 Model.registerEvents = (models) => {
 	Model.beforeDestroy((file) => {
-		fs.unlinkSync(file.url);
+		try {
+			fs.unlinkSync(file.url);
+		} catch (error) {}
 	});
 };
 

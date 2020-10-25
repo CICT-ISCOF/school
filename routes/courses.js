@@ -58,6 +58,7 @@ router.post(
 	[
 		body('title').notEmpty().bail().isString(),
 		body('tuition').notEmpty().bail().isString(),
+		body('description').notEmpty().bail().isString(),
 		body('DegreeId')
 			.notEmpty()
 			.bail()
@@ -102,6 +103,7 @@ router.put(
 	[
 		body('title').notEmpty().bail().isString().bail().optional(),
 		body('tuition').notEmpty().bail().isString().bail().optional(),
+		body('description').notEmpty().bail().isString().optional(),
 		body('DegreeId')
 			.notEmpty()
 			.bail()

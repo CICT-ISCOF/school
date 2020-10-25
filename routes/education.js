@@ -72,6 +72,7 @@ router.post(
 				nullable: true,
 			})
 			.toDate(),
+		body('description').notEmpty().bail().isString(),
 		body('SchoolId')
 			.notEmpty()
 			.bail()
@@ -131,6 +132,7 @@ router.put(
 					: Promise.reject('Invalid type.');
 			})
 			.optional(),
+		body('description').notEmpty().bail().isString().optional(),
 		body('tuition').notEmpty().bail().isString().bail().optional(),
 		body('date_of_examination')
 			.notEmpty()
