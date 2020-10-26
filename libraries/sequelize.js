@@ -11,6 +11,10 @@ const sequelize = new Sequelize(database, username, password, {
 	dialect,
 	host,
 	port,
+	define: {
+		charset: 'utf8',
+		collate: 'utf8_general_ci',
+	},
 });
 
 (async () => {

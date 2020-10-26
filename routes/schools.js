@@ -13,6 +13,7 @@ const fs = require('fs');
 const passport = require('../libraries/passport');
 
 const { body, matchedData, validationResult } = require('express-validator');
+const { Op } = require('sequelize');
 
 router.get('/', async (req, res) => {
 	try {
@@ -44,6 +45,48 @@ router.get('/', async (req, res) => {
 	} catch (error) {
 		console.log(error);
 		res.status(500).json(error);
+	}
+});
+
+router.get('/search', async (req, res) => {
+	const params = {};
+	for (const key in req.query) {
+		const keyword = req.query[key];
+		params[key] = {
+			[Op.substring]: keyword,
+		};
+	}
+	console.log(params);
+	try {
+		res.json(
+			await School.findAll({
+				where: params,
+				include: [
+					{
+						model: File,
+						as: 'ProfilePicture',
+					},
+					{
+						model: File,
+						as: 'CoverPhoto',
+					},
+					Education,
+					{
+						model: Degree,
+						include: [
+							{
+								model: Course,
+								include: Major,
+							},
+						],
+					},
+					User,
+				],
+			})
+		);
+	} catch (error) {
+		console.log(error);
+		res.json([]);
 	}
 });
 
