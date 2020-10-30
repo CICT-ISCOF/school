@@ -1,7 +1,10 @@
-require('./server');
+const server = require('./server');
+server.on('listening', () => {});
+
 const sequelize = require('./libraries/sequelize');
 
-sequelize
-	.dropAllSchemas()
-	.catch(() => {})
-	.finally(() => process.exit(0));
+sequelize.sync().then(() => {
+	sequelize.drop();
+});
+
+process.exit(0);

@@ -30,6 +30,10 @@ Model.registerEvents = ({ Major }) => {
 		});
 		majors.forEach((major) => major.destroy());
 	});
+
+	Model.afterCreate(function (course) {
+		course.Majors = [];
+	});
 };
 
 module.exports = Model;

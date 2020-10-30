@@ -9,6 +9,7 @@ const {
 	Education,
 	Token,
 	Course,
+	Major,
 } = require('../models');
 const { body, validationResult, matchedData } = require('express-validator');
 
@@ -26,7 +27,23 @@ router.get('/', async (req, res) => {
 				include: [
 					{
 						model: School,
-						include: [File, Degree, Education],
+						include: [
+							{
+								model: File,
+								as: 'ProfilePicture',
+							},
+							{ model: File, as: 'CoverPhoto' },
+							{
+								model: Degree,
+								include: [
+									{
+										model: Course,
+										include: Major,
+									},
+								],
+							},
+							Education,
+						],
 					},
 				],
 			})
@@ -49,10 +66,19 @@ router.get(
 						{
 							model: School,
 							include: [
-								File,
+								{
+									model: File,
+									as: 'ProfilePicture',
+								},
+								{ model: File, as: 'CoverPhoto' },
 								{
 									model: Degree,
-									include: Course,
+									include: [
+										{
+											model: Course,
+											include: Major,
+										},
+									],
 								},
 								Education,
 							],
@@ -119,7 +145,32 @@ router.post(
 			type,
 			password: hash.hashSync(password, 10),
 		});
-		return res.status(201).json(user);
+		return res.status(201).json(
+			await User.findByPk(user.id, {
+				include: [
+					{
+						model: School,
+						include: [
+							{
+								model: File,
+								as: 'ProfilePicture',
+							},
+							{ model: File, as: 'CoverPhoto' },
+							{
+								model: Degree,
+								include: [
+									{
+										model: Course,
+										include: Major,
+									},
+								],
+							},
+							Education,
+						],
+					},
+				],
+			})
+		);
 	}
 );
 
@@ -141,12 +192,35 @@ router.put(
 		const id = req.params.id;
 		const data = matchedData(req, { locations: ['body'] });
 		try {
-			const user = await User.findByPk(id);
+			const user = await User.findByPk(id, {
+				include: [
+					{
+						model: School,
+						include: [
+							{
+								model: File,
+								as: 'ProfilePicture',
+							},
+							{ model: File, as: 'CoverPhoto' },
+							{
+								model: Degree,
+								include: [
+									{
+										model: Course,
+										include: Major,
+									},
+								],
+							},
+							Education,
+						],
+					},
+				],
+			});
 			if (!user) {
 				return res.sendStatus(404);
 			}
 			if ('password' in data) {
-				data.password = hash.hashSync(data.password);
+				data.password = hash.hashSync(data.password, 10);
 			}
 			user.update(data);
 			return res.json(user);

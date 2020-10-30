@@ -14,6 +14,8 @@ const passport = require('../libraries/passport');
 
 const { body, matchedData, validationResult } = require('express-validator');
 const { Op } = require('sequelize');
+const sequelize = require('../libraries/sequelize');
+const { Sequelize } = require('../libraries/sequelize');
 
 router.get('/', async (req, res) => {
 	try {
@@ -52,9 +54,12 @@ router.get('/search', async (req, res) => {
 	const params = {};
 	for (const key in req.query) {
 		const keyword = req.query[key];
-		params[key] = {
-			[Op.substring]: keyword,
-		};
+		params[key] = Sequelize.where(
+			Sequelize.fn('lower', Sequelize.col(`School.${key}`)),
+			{
+				[Op.substring]: keyword,
+			}
+		);
 	}
 	console.log(params);
 	try {
@@ -165,13 +170,37 @@ router.post(
 
 			const school = await School.create(data);
 
-			school.set('ProfilePicture', profilePicture);
-			school.set('CoverPhoto', coverPhoto);
-
-			return res.status(201).json(school);
+			return res.status(201).json(
+				await School.findByPk(school.id, {
+					include: [
+						{
+							model: File,
+							as: 'ProfilePicture',
+						},
+						{
+							model: File,
+							as: 'CoverPhoto',
+						},
+						Education,
+						{
+							model: Degree,
+							include: [
+								{
+									model: Course,
+									include: Major,
+								},
+							],
+						},
+						User,
+					],
+				})
+			);
 		} catch (error) {
-			if (req.file) {
-				fs.unlinkSync(req.file.path);
+			if (req.files['profile_picture'].length > 0) {
+				fs.unlinkSync(req.files['profile_picture'][0].path);
+			}
+			if (req.files['cover_photo'].length > 0) {
+				fs.unlinkSync(req.files['cover_photo'][0].path);
 			}
 			console.log(error);
 			res.status(500).json(error);
@@ -232,7 +261,16 @@ router.put(
 						as: 'CoverPhoto',
 					},
 					Education,
-					Degree,
+					{
+						model: Degree,
+						include: [
+							{
+								model: Course,
+								include: Major,
+							},
+						],
+					},
+					User,
 				],
 			});
 

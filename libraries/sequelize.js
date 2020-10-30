@@ -13,7 +13,9 @@ const sequelize = new Sequelize(database, username, password, {
 	port,
 	define: {
 		charset: 'utf8',
-		collate: 'utf8_general_ci',
+		dialectOptions: {
+			collate: 'utf8_general_ci',
+		},
 	},
 });
 

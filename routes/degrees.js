@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { Degree, School, Course, Major } = require('../models');
+const { Degree, School, Course, Major, File, Education } = require('../models');
 const { upload } = require('../libraries/multer');
 const fs = require('fs');
 const passport = require('../libraries/passport');
@@ -31,7 +31,20 @@ router.get('/:id', async (req, res) => {
 		return res.json(
 			await Degree.findByPk(id, {
 				include: [
-					School,
+					{
+						model: School,
+						include: [
+							{
+								model: File,
+								as: 'ProfilePicture',
+							},
+							{
+								model: File,
+								as: 'CoverPhoto',
+							},
+							Education,
+						],
+					},
 					{
 						model: Course,
 						include: [Major],
@@ -92,7 +105,20 @@ router.post(
 			return res.status(201).json(
 				await Degree.findByPk(degree.id, {
 					include: [
-						School,
+						{
+							model: School,
+							include: [
+								{
+									model: File,
+									as: 'ProfilePicture',
+								},
+								{
+									model: File,
+									as: 'CoverPhoto',
+								},
+								Education,
+							],
+						},
 						{
 							model: Course,
 							include: [Major],
@@ -157,7 +183,20 @@ router.put(
 
 			const degree = await Degree.findByPk(id, {
 				include: [
-					School,
+					{
+						model: School,
+						include: [
+							{
+								model: File,
+								as: 'ProfilePicture',
+							},
+							{
+								model: File,
+								as: 'CoverPhoto',
+							},
+							Education,
+						],
+					},
 					{
 						model: Course,
 						include: [Major],

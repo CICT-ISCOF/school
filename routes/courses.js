@@ -1,7 +1,5 @@
 const router = require('express').Router();
-const { Course, File, Education, Degree, User, School } = require('../models');
-const { upload } = require('../libraries/multer');
-const fs = require('fs');
+const { Course, Degree, Major } = require('../models');
 const passport = require('../libraries/passport');
 
 const { body, matchedData, validationResult } = require('express-validator');
@@ -10,17 +8,7 @@ router.get('/', async (req, res) => {
 	try {
 		res.json(
 			await Course.findAll({
-				include: [
-					{
-						model: Degree,
-						include: [
-							{
-								model: School,
-								include: [Education, File, User],
-							},
-						],
-					},
-				],
+				include: Major,
 			})
 		);
 	} catch (error) {
@@ -34,17 +22,7 @@ router.get('/:id', async (req, res) => {
 	try {
 		return res.json(
 			await Course.findByPk(id, {
-				include: [
-					{
-						model: Degree,
-						include: [
-							{
-								model: School,
-								include: [Education, File, User],
-							},
-						],
-					},
-				],
+				include: Major,
 			})
 		);
 	} catch (error) {
@@ -89,7 +67,11 @@ router.post(
 
 			const course = await Course.create(data);
 
-			return res.status(201).json(course);
+			return res.status(201).json(
+				await Course.findByPk(course.id, {
+					include: Major,
+				})
+			);
 		} catch (error) {
 			console.log(error);
 			res.status(500).json(error);
@@ -135,7 +117,7 @@ router.put(
 			const data = matchedData(req, { locations: ['body'] });
 
 			const course = await Course.findByPk(id, {
-				include: Degree,
+				include: Major,
 			});
 
 			if (!course) {
@@ -144,7 +126,7 @@ router.put(
 
 			course.update(data);
 
-			return res.json(Course);
+			return res.json(course);
 		} catch (error) {
 			console.log(error);
 			res.status(500).json(error);

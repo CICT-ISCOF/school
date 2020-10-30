@@ -19,7 +19,17 @@ router.get('/', async (req, res) => {
 								include: [
 									{
 										model: School,
-										include: [File, Education],
+										include: [
+											{
+												model: File,
+												as: 'ProfilePicture',
+											},
+											{
+												model: File,
+												as: 'CoverPhoto',
+											},
+											Education,
+										],
 									},
 								],
 							},
@@ -48,7 +58,17 @@ router.get('/:id', async (req, res) => {
 								include: [
 									{
 										model: School,
-										include: [File, Education],
+										include: [
+											{
+												model: File,
+												as: 'ProfilePicture',
+											},
+											{
+												model: File,
+												as: 'CoverPhoto',
+											},
+											Education,
+										],
 									},
 								],
 							},

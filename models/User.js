@@ -16,8 +16,9 @@ const Model = sequelize.define('User', {
 	},
 });
 
-Model.associate = ({ Token }) => {
+Model.associate = ({ Token, School }) => {
 	Model.hasMany(Token);
+	Model.hasMany(School);
 };
 
 Model.registerEvents = ({ Token }) => {

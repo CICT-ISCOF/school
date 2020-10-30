@@ -26,8 +26,12 @@ const Model = sequelize.define('File', {
 	uri: {
 		type: DataTypes.VIRTUAL,
 		get() {
+			const url =
+				process.env.ENV === 'local'
+					? `${process.env.HOST}:${process.env.PORT}`
+					: process.env.HOST;
 			const scope = this.public === 1 ? 'public' : 'private';
-			return `${process.env.HOST}:${process.env.PORT}/api/file/${scope}/${this.id}`;
+			return `${url}/api/file/${scope}/${this.id}`;
 		},
 	},
 });
