@@ -9,7 +9,9 @@ router.get('/public/:id', async (req, res) => {
 	if (!file || file.public !== 1) {
 		return res.sendStatus(404);
 	}
+
 	const binary = fs.readFileSync(file.url);
+
 	res.setHeader('Content-Type', file.type);
 	res.setHeader('Content-Length', file.size);
 	res.send(binary);
@@ -24,7 +26,9 @@ router.get(
 		if (!file) {
 			return res.sendStatus(404);
 		}
+
 		const binary = fs.readFileSync(file.url);
+
 		res.setHeader('Content-Type', file.type);
 		res.setHeader('Content-Length', file.size);
 		res.send(binary);
