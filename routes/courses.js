@@ -17,6 +17,31 @@ router.get('/', async (req, res) => {
 	}
 });
 
+router.get('/search', async (req, res) => {
+	const params = {};
+	for (const key in req.query) {
+		const keyword = req.query[key];
+		params[key] = Sequelize.where(
+			Sequelize.fn('lower', Sequelize.col(`Course.${key}`)),
+			{
+				[Op.substring]: keyword,
+			}
+		);
+	}
+
+	try {
+		res.json(
+			await Course.findAll({
+				where: params,
+				include: Major,
+			})
+		);
+	} catch (error) {
+		console.log(error);
+		res.json([]);
+	}
+});
+
 router.get('/:id', async (req, res) => {
 	const id = req.params.id;
 	try {

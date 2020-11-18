@@ -61,7 +61,7 @@ router.get('/search', async (req, res) => {
 			}
 		);
 	}
-	console.log(params);
+
 	try {
 		res.json(
 			await School.findAll({
