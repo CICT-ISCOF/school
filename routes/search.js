@@ -139,3 +139,5 @@ router.get('/schools', async (req, res) => {
 		res.json([]);
 	}
 });
+
+module.exports = router;
