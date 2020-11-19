@@ -8,8 +8,12 @@ const {
 	Education,
 	User,
 } = require('../models');
+const { Op } = require('sequelize');
+const sequelize = require('../libraries/sequelize');
+const { Sequelize } = require('../libraries/sequelize');
 
 router.get('/schools', async (req, res) => {
+	const params = {};
 	if (!('query' in req.query)) {
 		return res.status(422).json({
 			message: 'Query is required.',
@@ -17,8 +21,9 @@ router.get('/schools', async (req, res) => {
 	}
 	const schoolKeys = ['region', 'district', 'province', 'name', 'address'];
 	const query = req.query.query;
+
 	schoolKeys.forEach((key) => {
-		params[key] = Sequelize.where(
+		params[key] = Sequelize.or(
 			Sequelize.fn('lower', Sequelize.col(`School.${key}`)),
 			{
 				[Op.substring]: query,
@@ -131,6 +136,15 @@ router.get('/schools', async (req, res) => {
 
 	degrees.forEach((degree) => schools.push(degree.School));
 	majors.forEach((major) => schools.push(major.Course.Degree.School));
+
+	if (
+		'type' in req.query &&
+		['Both', 'Public', 'Private'].includes(req.query.type)
+	) {
+		return res.json(
+			schools.filter((school) => school.type === req.query.type)
+		);
+	}
 
 	try {
 		res.json(schools);
