@@ -13,58 +13,29 @@ const sequelize = require('../libraries/sequelize');
 const { Sequelize } = require('../libraries/sequelize');
 
 router.get('/schools', async (req, res) => {
-	const params = {};
-	if (!('query' in req.query)) {
-		return res.status(422).json({
-			message: 'Query is required.',
+	const schools = [];
+	if ('school' in req.query) {
+		const schoolKeys = [
+			'region',
+			'district',
+			'province',
+			'name',
+			'address',
+		];
+		const query = req.query.query;
+		const params = {};
+		schoolKeys.forEach((key) => {
+			params[key] = Sequelize.or(
+				Sequelize.fn('lower', Sequelize.col(`School.${key}`)),
+				{
+					[Op.substring]: query,
+				}
+			);
 		});
-	}
-	const schoolKeys = ['region', 'district', 'province', 'name', 'address'];
-	const query = req.query.query;
 
-	schoolKeys.forEach((key) => {
-		params[key] = Sequelize.or(
-			Sequelize.fn('lower', Sequelize.col(`School.${key}`)),
-			{
-				[Op.substring]: query,
-			}
-		);
-	});
-
-	const schools = await School.findAll({
-		where: params,
-		include: [
-			{
-				model: File,
-				as: 'ProfilePicture',
-			},
-			{
-				model: File,
-				as: 'CoverPhoto',
-			},
-			Education,
-			{
-				model: Degree,
-				include: [
-					{
-						model: Course,
-						include: Major,
-					},
-				],
-			},
-			User,
-		],
-	});
-
-	const degrees = await Degree.findAll({
-		where: {
-			name: {
-				[Op.substring]: query,
-			},
-		},
-		include: [
-			{
-				model: School,
+		(
+			await School.findAll({
+				where: params,
 				include: [
 					{
 						model: File,
@@ -86,56 +57,139 @@ router.get('/schools', async (req, res) => {
 					},
 					User,
 				],
-			},
-		],
-	});
+			})
+		).forEach((school) => schools.push(school));
+	}
 
-	const majors = await Major.findAll({
-		where: {
-			title: {
-				[Op.substring]: query,
+	if ('degree' in req.query) {
+		const degree = req.query.degree;
+		const degrees = await Degree.findAll({
+			where: {
+				name: {
+					[Op.substring]: degree,
+				},
 			},
-		},
-		include: [
-			{
-				model: Course,
-				include: [
-					{
-						model: Degree,
-						include: [
-							{
-								model: School,
-								include: [
-									{
-										model: File,
-										as: 'ProfilePicture',
-									},
-									{
-										model: File,
-										as: 'CoverPhoto',
-									},
-									Education,
-									{
-										model: Degree,
-										include: [
-											{
-												model: Course,
-												include: Major,
-											},
-										],
-									},
-									User,
-								],
-							},
-						],
-					},
-				],
-			},
-		],
-	});
+			include: [
+				{
+					model: School,
+					include: [
+						{
+							model: File,
+							as: 'ProfilePicture',
+						},
+						{
+							model: File,
+							as: 'CoverPhoto',
+						},
+						Education,
+						{
+							model: Degree,
+							include: [
+								{
+									model: Course,
+									include: Major,
+								},
+							],
+						},
+						User,
+					],
+				},
+			],
+		});
 
-	degrees.forEach((degree) => schools.push(degree.School));
-	majors.forEach((major) => schools.push(major.Course.Degree.School));
+		degrees.forEach((degree) => schools.push(degree.School));
+	}
+
+	if ('major' in req.query) {
+		const majors = await Major.findAll({
+			where: {
+				title: {
+					[Op.substring]: req.query.major,
+				},
+			},
+			include: [
+				{
+					model: Course,
+					include: [
+						{
+							model: Degree,
+							include: [
+								{
+									model: School,
+									include: [
+										{
+											model: File,
+											as: 'ProfilePicture',
+										},
+										{
+											model: File,
+											as: 'CoverPhoto',
+										},
+										Education,
+										{
+											model: Degree,
+											include: [
+												{
+													model: Course,
+													include: Major,
+												},
+											],
+										},
+										User,
+									],
+								},
+							],
+						},
+					],
+				},
+			],
+		});
+
+		majors.forEach((major) => schools.push(major.Course.Degree.School));
+	}
+
+	if ('course' in req.query) {
+		const courses = await Course.findAll({
+			where: {
+				title: {
+					[Op.substring]: req.query.course,
+				},
+			},
+			include: [
+				{
+					model: Degree,
+					include: [
+						{
+							model: School,
+							include: [
+								{
+									model: File,
+									as: 'ProfilePicture',
+								},
+								{
+									model: File,
+									as: 'CoverPhoto',
+								},
+								Education,
+								{
+									model: Degree,
+									include: [
+										{
+											model: Course,
+											include: Major,
+										},
+									],
+								},
+								User,
+							],
+						},
+					],
+				},
+			],
+		});
+
+		courses.forEach((course) => schools.push(course.Degree.School));
+	}
 
 	if (
 		'type' in req.query &&
