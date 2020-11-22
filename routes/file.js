@@ -2,6 +2,10 @@ const router = require('express').Router();
 const { File } = require('../models');
 const fs = require('fs');
 const passport = require('../libraries/passport');
+const { Dropbox } = require('dropbox');
+const { default: Axios } = require('axios');
+
+const dbx = new Dropbox({ accessToken: process.env.DROPBOX_TOKEN });
 
 router.get('/public/:id', async (req, res) => {
 	const id = req.params.id;
@@ -10,11 +14,13 @@ router.get('/public/:id', async (req, res) => {
 		return res.sendStatus(404);
 	}
 
-	const binary = fs.readFileSync(file.url);
+	const result = await dbx.filesDownload({
+		path: `/${file.name}`,
+	});
 
 	res.setHeader('Content-Type', file.type);
 	res.setHeader('Content-Length', file.size);
-	res.send(binary);
+	res.send(result.result.fileBinary);
 });
 
 router.get(
@@ -27,11 +33,13 @@ router.get(
 			return res.sendStatus(404);
 		}
 
-		const binary = fs.readFileSync(file.url);
+		const result = await dbx.filesDownload({
+			path: `/${file.name}`,
+		});
 
 		res.setHeader('Content-Type', file.type);
 		res.setHeader('Content-Length', file.size);
-		res.send(binary);
+		res.send(result.result.fileBinary);
 	}
 );
 

@@ -1,6 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../libraries/sequelize');
 const fs = require('fs');
+const Dropbox = require('dropbox');
 
 const Model = sequelize.define('File', {
 	type: {
@@ -53,6 +54,17 @@ Model.registerEvents = (models) => {
 		try {
 			fs.unlinkSync(file.url);
 		} catch (error) {}
+	});
+	Model.afterCreate(async (file) => {
+		const dbx = new Dropbox.Dropbox({
+			accessToken: process.env.DROPBOX_TOKEN,
+		});
+
+		const binary = fs.readFileSync(file.url);
+		await dbx.filesUpload({
+			path: `/${file.name}`,
+			contents: binary,
+		});
 	});
 };
 
