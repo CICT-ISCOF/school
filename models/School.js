@@ -52,9 +52,10 @@ const Model = sequelize.define('School', {
 	},
 });
 
-Model.associate = ({ Degree, File, Education, User }) => {
+Model.associate = ({ Degree, File, Education, User, Rating }) => {
 	Model.hasMany(Degree);
 	Model.hasMany(Education);
+	Model.hasMany(Rating);
 	Model.belongsTo(File, {
 		as: 'ProfilePicture',
 		foreignKey: 'ProfilePictureId',
@@ -63,7 +64,7 @@ Model.associate = ({ Degree, File, Education, User }) => {
 	Model.belongsTo(User);
 };
 
-Model.registerEvents = ({ Degree, Education, File }) => {
+Model.registerEvents = ({ Degree, Education, File, Rating }) => {
 	Model.afterDestroy(async (school) => {
 		const profilePicture = await File.findByPk(school.ProfilePictureId);
 		profilePicture.destroy();
@@ -73,6 +74,13 @@ Model.registerEvents = ({ Degree, Education, File }) => {
 	});
 
 	Model.beforeDestroy(async (school) => {
+		const ratings = await Rating.findAll({
+			where: {
+				SchoolId: school.id,
+			},
+		});
+		ratings.forEach((rating) => rating.destroy());
+
 		const degrees = await Degree.findAll({
 			where: {
 				SchoolId: school.id,
@@ -85,7 +93,6 @@ Model.registerEvents = ({ Degree, Education, File }) => {
 				SchoolId: school.id,
 			},
 		});
-
 		education.forEach((education) => education.destroy());
 	});
 };
