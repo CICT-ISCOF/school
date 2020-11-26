@@ -24,10 +24,10 @@ router.get('/', async (req, res) => {
 		.map((rate, index) => (index + 1) * rate)
 		.reduce((prev, next) => prev + next);
 
-	const result = average / all;
+	const result = Number(average / all ? average / all : 0);
 
 	return res.json({
-		total: result ? result : 0,
+		total: result.isInteger() ? result : result.toFixed(1),
 	});
 });
 
