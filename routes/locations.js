@@ -37,7 +37,7 @@ router.get('/rating-status', async (req, res) => {
 	try {
 		const rating = await Rating.findOne({
 			where: {
-				ip_address: req.ip,
+				ip_address: req.query.ip_address,
 				SchoolId: req.query.SchoolId,
 			},
 		});

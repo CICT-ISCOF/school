@@ -58,6 +58,7 @@ router.post(
 					return Promise.reject('Unable to verify School ID.');
 				}
 			}),
+		body('ip_address').notEmpty().bail().isString(),
 	],
 	async (req, res) => {
 		const errors = validationResult(req).array();
@@ -68,7 +69,6 @@ router.post(
 
 		try {
 			const data = matchedData(req, { locations: ['body'] });
-			data.ip_address = req.ip;
 
 			const rating = await Rating.create(data);
 			return res.status(201).json(rating);
