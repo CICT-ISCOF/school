@@ -34,6 +34,7 @@ app.use('/api/rating', require('./routes/rating'));
 app.use('/api/search', require('./routes/search'));
 app.use('/api/schools', require('./routes/schools'));
 app.use('/api/users', require('./routes/users'));
+app.use('/api/locations', require('./routes/locations'));
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

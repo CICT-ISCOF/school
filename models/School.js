@@ -52,10 +52,11 @@ const Model = sequelize.define('School', {
 	},
 });
 
-Model.associate = ({ Degree, File, Education, User, Rating }) => {
+Model.associate = ({ Degree, File, Education, User, Rating, Link }) => {
 	Model.hasMany(Degree);
 	Model.hasMany(Education);
 	Model.hasMany(Rating);
+	Model.hasMany(Link);
 	Model.belongsTo(File, {
 		as: 'ProfilePicture',
 		foreignKey: 'ProfilePictureId',

@@ -27,7 +27,7 @@ router.get('/', async (req, res) => {
 	const result = Number(average / all ? average / all : 0);
 
 	return res.json({
-		total: result.isInteger() ? result : result.toFixed(1),
+		total: Number.isInteger(result) ? result : Number(result).toFixed(1),
 	});
 });
 

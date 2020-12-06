@@ -10,6 +10,7 @@ const models = {
 	Education: require('./Education'),
 	File: require('./File'),
 	Major: require('./Major'),
+	Link: require('./Link'),
 	Rating: require('./Rating'),
 	School: require('./School'),
 	User: require('./User'),
