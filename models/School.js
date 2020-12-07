@@ -65,7 +65,7 @@ Model.associate = ({ Degree, File, Education, User, Rating, Link }) => {
 	Model.belongsTo(User);
 };
 
-Model.registerEvents = ({ Degree, Education, File, Rating }) => {
+Model.registerEvents = ({ Degree, Education, File, Rating, Link }) => {
 	Model.afterDestroy(async (school) => {
 		const profilePicture = await File.findByPk(school.ProfilePictureId);
 		profilePicture.destroy();
@@ -95,6 +95,13 @@ Model.registerEvents = ({ Degree, Education, File, Rating }) => {
 			},
 		});
 		education.forEach((education) => education.destroy());
+
+		const links = await Link.findAll({
+			where: {
+				SchoolId: school.id,
+			},
+		});
+		links.forEach((link) => link.destroy());
 	});
 };
 

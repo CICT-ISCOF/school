@@ -7,6 +7,7 @@ const {
 	Major,
 	Education,
 	User,
+	Link,
 } = require('../models');
 const { Op } = require('sequelize');
 const sequelize = require('../libraries/sequelize');
@@ -42,6 +43,7 @@ router.get('/schools', async (req, res) => {
 						],
 					},
 					User,
+					Link,
 				],
 			})
 		).forEach((school) => schools.push(school));
@@ -83,6 +85,7 @@ router.get('/schools', async (req, res) => {
 						],
 					},
 					User,
+					Link,
 				],
 			})
 		).forEach((school) => schools.push(school));
@@ -119,6 +122,7 @@ router.get('/schools', async (req, res) => {
 							],
 						},
 						User,
+						Link,
 					],
 				},
 			],
@@ -163,6 +167,7 @@ router.get('/schools', async (req, res) => {
 											],
 										},
 										User,
+										Link,
 									],
 								},
 							],
@@ -208,6 +213,7 @@ router.get('/schools', async (req, res) => {
 									],
 								},
 								User,
+								Link,
 							],
 						},
 					],

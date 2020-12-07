@@ -7,6 +7,7 @@ const {
 	User,
 	Course,
 	Major,
+	Link,
 } = require('../models');
 const { upload } = require('../libraries/multer');
 const fs = require('fs');
@@ -41,6 +42,7 @@ router.get('/', async (req, res) => {
 						],
 					},
 					User,
+					Link,
 				],
 			})
 		);
@@ -86,6 +88,7 @@ router.get('/search', async (req, res) => {
 						],
 					},
 					User,
+					Link,
 				],
 			})
 		);
@@ -115,6 +118,7 @@ router.get('/:id', async (req, res) => {
 						include: Course,
 					},
 					User,
+					Link,
 				],
 			})
 		);
@@ -192,6 +196,7 @@ router.post(
 							],
 						},
 						User,
+						Link,
 					],
 				})
 			);
@@ -271,6 +276,7 @@ router.put(
 						],
 					},
 					User,
+					Link,
 				],
 			});
 
