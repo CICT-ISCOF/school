@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const { Op } = require('sequelize/types');
 const { School, Rating } = require('../models');
 
 router.get('/regions', async (req, res) => {
@@ -19,7 +20,16 @@ router.get('/regions', async (req, res) => {
 
 router.get('/provinces', async (req, res) => {
 	try {
-		const schools = await School.findAll();
+		const params = {};
+		if ('region' in req.query) {
+			const region = req.query.region;
+			params.where = {
+				region: {
+					[Op.substring]: region,
+				},
+			};
+		}
+		const schools = await School.findAll(params);
 		const data = [];
 		schools.forEach((school) => {
 			if (!data.includes(school.province)) {
