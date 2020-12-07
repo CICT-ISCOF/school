@@ -30,6 +30,7 @@ app.use('/api/degrees', require('./routes/degrees'));
 app.use('/api/education', require('./routes/education'));
 app.use('/api/file', require('./routes/file'));
 app.use('/api/majors', require('./routes/majors'));
+app.use('/api/links', require('./routes/links'));
 app.use('/api/rating', require('./routes/rating'));
 app.use('/api/search', require('./routes/search'));
 app.use('/api/schools', require('./routes/schools'));

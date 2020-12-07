@@ -151,4 +151,24 @@ router.delete(
 	}
 );
 
+router.delete(
+	'/truncate/:id',
+	passport.authenticate('bearer', { session: false }),
+	async (req, res) => {
+		const id = req.params.id;
+		try {
+			const links = await Link.findAll({
+				where: {
+					SchoolId: id,
+				},
+			});
+			links.forEach((link) => link.destroy());
+			return res.sendStatus(204);
+		} catch (error) {
+			console.log(error);
+			return res.status(500).json(error);
+		}
+	}
+);
+
 module.exports = router;
