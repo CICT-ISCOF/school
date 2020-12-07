@@ -20,32 +20,68 @@ const { Sequelize } = require('../libraries/sequelize');
 
 router.get('/', async (req, res) => {
 	try {
-		res.json(
-			await School.findAll({
-				include: [
-					{
-						model: File,
-						as: 'ProfilePicture',
+		const schools = await School.findAll({
+			include: [
+				{
+					model: File,
+					as: 'ProfilePicture',
+				},
+				{
+					model: File,
+					as: 'CoverPhoto',
+				},
+				Education,
+				{
+					model: Degree,
+					include: [
+						{
+							model: Course,
+							include: Major,
+						},
+					],
+				},
+				User,
+				Link,
+			],
+		});
+
+		const promises = [];
+
+		schools.forEach((school) =>
+			promises.push(
+				Rating.findAll({
+					where: {
+						SchoolId: school.id,
 					},
-					{
-						model: File,
-						as: 'CoverPhoto',
-					},
-					Education,
-					{
-						model: Degree,
-						include: [
-							{
-								model: Course,
-								include: Major,
-							},
-						],
-					},
-					User,
-					Link,
-				],
-			})
+				})
+			)
 		);
+
+		const schoolRatings = await Promise.all(promises);
+
+		schoolRatings.forEach((ratings, index) => {
+			const totals = [0, 0, 0, 0, 0];
+
+			ratings.forEach((rating) => {
+				totals[rating.rating - 1] += 1;
+			});
+
+			const all = totals.reduce((prev, next) => prev + next);
+
+			const average = totals
+				.map((rate, index) => (index + 1) * rate)
+				.reduce((prev, next) => prev + next);
+
+			const result = Number(average / all ? average / all : 0);
+
+			const total = Number.isInteger(result)
+				? result
+				: Number(result).toFixed(1);
+
+			schools[index].set('rating', total);
+		});
+
+		return res.json(schools);
 	} catch (error) {
 		console.log(error);
 		res.status(500).json(error);
