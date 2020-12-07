@@ -50,8 +50,110 @@ router.get('/schools', async (req, res) => {
 			).forEach((school) => schools.push(school));
 		}
 
+		if ('region' in req.query) {
+			(
+				await School.findAll({
+					where: {
+						region: {
+							[Op.substring]: req.query.region,
+						},
+					},
+					include: [
+						{
+							model: File,
+							as: 'ProfilePicture',
+						},
+						{
+							model: File,
+							as: 'CoverPhoto',
+						},
+						Education,
+						{
+							model: Degree,
+							include: [
+								{
+									model: Course,
+									include: Major,
+								},
+							],
+						},
+						User,
+						Link,
+					],
+				})
+			).forEach((school) => schools.push(school));
+		}
+
+		if ('address' in req.query) {
+			(
+				await School.findAll({
+					where: {
+						address: {
+							[Op.substring]: req.query.address,
+						},
+					},
+					include: [
+						{
+							model: File,
+							as: 'ProfilePicture',
+						},
+						{
+							model: File,
+							as: 'CoverPhoto',
+						},
+						Education,
+						{
+							model: Degree,
+							include: [
+								{
+									model: Course,
+									include: Major,
+								},
+							],
+						},
+						User,
+						Link,
+					],
+				})
+			).forEach((school) => schools.push(school));
+		}
+
+		if ('province' in req.query) {
+			(
+				await School.findAll({
+					where: {
+						province: {
+							[Op.substring]: req.query.province,
+						},
+					},
+					include: [
+						{
+							model: File,
+							as: 'ProfilePicture',
+						},
+						{
+							model: File,
+							as: 'CoverPhoto',
+						},
+						Education,
+						{
+							model: Degree,
+							include: [
+								{
+									model: Course,
+									include: Major,
+								},
+							],
+						},
+						User,
+						Link,
+					],
+				})
+			).forEach((school) => schools.push(school));
+		}
+
 		if ('school' in req.query) {
-			const schoolKeys = ['region', 'district', 'province', 'name'];
+			const schoolKeys = ['district', 'name'];
 			const query = req.query.query;
 			const params = {};
 			schoolKeys.forEach((key) => {
