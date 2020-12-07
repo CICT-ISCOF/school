@@ -8,6 +8,7 @@ const {
 	Course,
 	Major,
 	Link,
+	Rating,
 } = require('../models');
 const { upload } = require('../libraries/multer');
 const fs = require('fs');
