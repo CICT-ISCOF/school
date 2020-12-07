@@ -79,7 +79,8 @@ router.get('/', async (req, res) => {
 				? result
 				: Number(result).toFixed(1);
 
-			schools[index].set('rating', total);
+			schools[index] = schools[index].toJSON();
+			schools[index]['ratings'] = total;
 		});
 
 		return res.json(schools);
