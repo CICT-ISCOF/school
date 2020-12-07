@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { Op } = require('sequelize/types');
+const { Op } = require('sequelize');
 const { School, Rating } = require('../models');
 
 router.get('/regions', async (req, res) => {
